@@ -34,6 +34,8 @@ shinyUI(fluidPage(
             #conditional analyses for plot type
             conditionalPanel(
                 condition = "input.plotType == 'Scatterplot'",   
+                numericInput("xmin", "x-axis minimum:", 0),
+                numericInput("xmax", "x-axis maximum value:", 1000000),
                 checkboxInput("scatplotType", "Linear Regression", FALSE)
             ),
             conditionalPanel(
@@ -54,10 +56,10 @@ shinyUI(fluidPage(
             #building multiple tabs
             navlistPanel(
                 #totals tab
-                tabPanel("Totals"),
+                tabPanel("Totals", plotOutput("TotalsPlot")),
                 
                 #rate per 100,000 tab
-                tabPanel("Rate per 100,000 Population"),
+                tabPanel("Rate per 100,000 Population", plotOutput("RatePlot")),
                 
                 #about me tab
                 tabPanel("About", 
