@@ -141,7 +141,74 @@ shinyServer(function(input, output) {
         if(input$plotType == 'Scatterplot'){
             plot(x = dataToPlot[,c(1,4)], xlab = "Year", ylab = LAB,
                  ylim = c(input$ymin, input$ymax))
-            if(input$scatplotType == 'true'){
+            if(input$scatplotType){
+                
+                
+                #in order to run regression, we need the total population
+                #however, we don't have that. so we make it instead with the 
+                #equation
+                #pop = (total incidents*100,000)/incident rate per 100,000
+                
+                #collecting data for equation
+                if(input$dataSource == "DataFileTotal"){
+                    rows = 20
+                }
+                else{
+                    rows = 10
+                }
+                populationMatrix = matrix(0, nrow = rows, ncol = 4)
+                colnames(populationMatrix) <- c("Date", "Total Incidents", "Total Rate", "Total Population")
+                
+                
+                addedRows = 0
+                #getting totals incidents + years
+                for (i in 1:dim(x())[1]){
+                    if (x()[i,2] == 'Total, all violations [0]'){
+                        if(x()[i,3] == 'Actual incidents'){
+                            present = FALSE
+                            for (j in 1:dim(populationMatrix)[1]){
+                                if(x()[i,1]== populationMatrix[j,1]){
+                                    present = TRUE
+                                }
+                            }
+                            if (present == FALSE){
+                                addedRows = addedRows+1
+                                populationMatrix[addedRows, 1] = x()[i, 1] #year
+                                populationMatrix[addedRows, 2] = x()[i, 4] #total inc
+                            }
+                                
+                        }
+                    }
+                }
+                #getting rate
+                for (i in 1:dim(x())[1]){
+                    if (x()[i,2] == 'Total, all violations [0]'){
+                        if(x()[i,3] == 'Rate per 100,000 population'){
+                            for(j in 1:dim(populationMatrix)[1]){
+                                if(populationMatrix[j, 1] == x()[i,1]){
+                                    populationMatrix[j, 3] = x()[i, 4] #rate
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                #calc total population
+                for(j in 1:dim(populationMatrix)[1]){
+                    populationMatrix[j,4] = (populationMatrix[j,2]*100000)/populationMatrix[j,3]
+                }
+                
+                
+                #running regression
+                linearRegression<- lm(dataToPlot$Value ~ populationMatrix[,4])
+                #getting Conf Bands
+                newx = seq(min(dataToPlot$Date),max(dataToPlot$Date), length.out = rows)
+                conf_interval <- predict(linearRegression, newdata=data.frame(x=newx), interval="confidence",
+                                         level = 0.95)
+                #replotting with regression
+                plot(x = dataToPlot[,c(1,4)], xlab = "Year", ylab = LAB,
+                     ylim = c(input$ymin, input$ymax))
+                matlines(newx, conf_interval[,1:3], col = "blue", lty=2)
                 
             }
         }
@@ -149,7 +216,8 @@ shinyServer(function(input, output) {
             barplot(dataToPlot$Value,
                     xlab = LAB, horiz = TRUE, 
                     xlim = c(input$xmin, input$xmax), 
-                    legend.text = dataToPlot$Date)
+                    legend.text = dataToPlot$Date, 
+                    col = dataToPlot$Date)
         }
         
     })

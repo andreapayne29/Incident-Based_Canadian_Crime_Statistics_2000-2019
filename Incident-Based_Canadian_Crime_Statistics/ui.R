@@ -42,7 +42,7 @@ shinyUI(fluidPage(
             conditionalPanel(
                 condition = "input.plotType == 'Bar Plot'",   
                 numericInput("xmin", "x-axis minimum:", 0),
-                numericInput("xmax", "x-axis maximum value:", 3000000)
+                numericInput("xmax", "x-axis maximum value:", 4000000)
             ),
         
             
