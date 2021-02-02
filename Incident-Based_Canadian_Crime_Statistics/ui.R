@@ -35,14 +35,14 @@ shinyUI(fluidPage(
             #conditional analyses for plot type
             conditionalPanel(
                 condition = "input.plotType == 'Scatterplot'",   
-                numericInput("ymin", "y-axis minimum:", 2000000),
+                numericInput("ymin", "y-axis minimum:", 0),
                 numericInput("ymax", "y-axis maximum value:", 2800000),
                 checkboxInput("scatplotType", "Linear Regression", FALSE)
             ),
             conditionalPanel(
                 condition = "input.plotType == 'Bar Plot'",   
-                numericInput("xmin", "x-axis minimum:", 2000000),
-                numericInput("xmax", "x-axis maximum value:", 2800000)
+                numericInput("xmin", "x-axis minimum:", 0),
+                numericInput("xmax", "x-axis maximum value:", 3000000)
             ),
         
             

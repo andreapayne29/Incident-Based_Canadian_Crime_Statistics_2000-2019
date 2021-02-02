@@ -45,6 +45,7 @@ shinyServer(function(input, output) {
     
     output$TotalsPlot <- renderPlot({
         
+        
         #creating temp dataframe to aid in plotting
         dataToPlot = as_tibble(matrix(NA, ncol = dim(x())[2])) %>%
             rename(Date = V1, Violations = V2, Statistics = V3, Value = V4)
@@ -56,54 +57,99 @@ shinyServer(function(input, output) {
             
             #total number of incidents
             if (input$statistic == 'Number of Incidents'){
-                #populating new dataframe and plotting
+                #populating new dataframe
                 for (i in 1:dim(x())[1]){
                     if (x()[i, 2] == 'Total, all violations [0]'){
                         if(x()[i, 3] == 'Actual incidents'){
                             dataToPlot = dataToPlot %>% add_row(x()[i,])
-                            #finding plot type
-                            if(input$plotType == 'Scatterplot'){
-                                plot(x = dataToPlot[,c(1,4)], xlab = "Year", ylab = "Number of Incidents",
-                                     ylim = c(input$ymin, input$ymax))
-                            }
-                            else if (input$plotType == 'Bar Plot'){
-                                barplot(dataToPlot$Value,
-                                        xlab = 'Number of Incidents', horiz = TRUE, 
-                                        xlim = c(input$xmin, input$xmax), 
-                                        legend.text = dataToPlot$Date)
-                            }
                         }
                     }
                 }
             }
-            
             #total number of persons cleared
             else if (input$statistic == 'Persons Cleared'){
-                #populating temp dataframe and plottting
+                #populating temp dataframe
                 for (i in 1:dim(x())[1]){
                     if (x()[i, 2] == 'Total, all violations [0]'){
                         if(x()[i, 3] == 'Total cleared'){
                             dataToPlot = dataToPlot %>% add_row(x()[i,])
-                            plot(x = dataToPlot[,c(1,4)], xlab = "Year", ylab = "Number of Persons Cleared")
                         }
                     }
                 }
             }
-            
             #total adults charged
             else if (input$statistic == 'Adults (18+ yrs) Charged'){
-                #populating temp dataframe and plottting
+                #populating temp dataframe
                 for (i in 1:dim(x())[1]){
                     if (x()[i, 2] == 'Total, all violations [0]'){
                         if(x()[i, 3] == 'Total, adult charged'){
                             dataToPlot = dataToPlot %>% add_row(x()[i,])
-                            plot(x = dataToPlot[,c(1,4)], xlab = "Year", ylab = "Number of Adults (18+ yrs old) Charged")
                         }
                     }
                 }
             }
-           
-            
+            #total youths charged
+            else if (input$statistic == 'Youths (12-17 yrs) Charged'){
+                #populating temp dataframe
+                for (i in 1:dim(x())[1]){
+                    if (x()[i, 2] == 'Total, all violations [0]'){
+                        if(x()[i, 3] == 'Total, youth charged'){
+                            dataToPlot = dataToPlot %>% add_row(x()[i,])
+                        }
+                    }
+                }
+            }
+            #total youths not charged
+            else if (input$statistic == 'Youths (12-17 yrs) Not Charged'){
+                #populating temp dataframe
+                for (i in 1:dim(x())[1]){
+                    if (x()[i, 2] == 'Total, all violations [0]'){
+                        if(x()[i, 3] == 'Total, youth not charged'){
+                            dataToPlot = dataToPlot %>% add_row(x()[i,])
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
+        dataToPlot = dataToPlot %>% remove_missing()               
+        
+        
+        #Plotting
+        
+        #getting labels
+        if(input$statistic == 'Number of Incidents'){
+            LAB = "Number of Incidents"
+        }
+        else if (input$statistic == 'Persons Cleared'){
+            LAB = "Persons Cleared"
+        }
+        else if (input$statistic == 'Adults (18+ yrs) Charged'){
+            LAB = "Adults (18+ yrs) Charged"
+        }
+        else if (input$statistic == 'Youths (12-17 yrs) Charged'){
+            LAB = "Youths (12-17 yrs) Charged"
+        }
+        else if (input$statistic == 'Youths (12-17 yrs) Not Charged'){
+            LAB = "Youths (12-17 yrs) Not Charged"
+        }
+        
+        
+        #finding plot type
+        if(input$plotType == 'Scatterplot'){
+            plot(x = dataToPlot[,c(1,4)], xlab = "Year", ylab = LAB,
+                 ylim = c(input$ymin, input$ymax))
+            if(input$scatplotType == 'true'){
+                
+            }
+        }
+        else if (input$plotType == 'Bar Plot'){
+            barplot(dataToPlot$Value,
+                    xlab = LAB, horiz = TRUE, 
+                    xlim = c(input$xmin, input$xmax), 
+                    legend.text = dataToPlot$Date)
         }
         
     })
