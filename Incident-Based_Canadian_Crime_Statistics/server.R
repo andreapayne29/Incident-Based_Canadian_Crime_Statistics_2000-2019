@@ -38,7 +38,23 @@ shinyServer(function(input, output) {
     ############################################################################
     
     output$TotalsPlot <- renderPlot({
-        plot(x = x()[,4], y = x()[,1])
+        
+        dataToPlot = as_tibble(matrix(NA, ncol = dim(x())[2])) %>%
+            rename(Date = V1, Violations = V2, Statistics = V3, Value = V4)
+        
+        
+        if (input$violation == 'All Violations'){
+            for (i in 1:dim(x())[1]){
+                if (x()[i, 2] == 'Total, all violations [0]'){
+                    dataToPlot = dataToPlot %>% add_row(x()[i,])
+                    plot(x = dataToPlot[,c(1,4)])
+                }
+            }
+            if (input$statistic == 'Number of Incidents'){
+                
+            }
+        }
+        
     })
         
 })
