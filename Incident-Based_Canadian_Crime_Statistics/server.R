@@ -38,6 +38,7 @@ shinyServer(function(input, output) {
     ############################################################################
     
     output$TotalsPlot <- renderPlot({
+        plot(x = x()[,4], y = x()[,1])
     })
         
 })
