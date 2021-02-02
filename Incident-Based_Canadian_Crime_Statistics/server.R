@@ -23,9 +23,15 @@ shinyServer(function(input, output) {
         } else {
             if(input$dataSource == "DataFile2010"){
                 read.csv("3510017701_crimestats2010-2019.csv")
-            }else{
+            } 
+            else {
+                if(input$dataSource == "DataFileTotal"){
+                read.csv("3510017701_crimestats2000-2019.csv")
+                }
+                else{
                 #This means do not use any data.  This will break things.
                 NULL
+                }
             }
         }
         
@@ -39,20 +45,65 @@ shinyServer(function(input, output) {
     
     output$TotalsPlot <- renderPlot({
         
+        #creating temp dataframe to aid in plotting
         dataToPlot = as_tibble(matrix(NA, ncol = dim(x())[2])) %>%
             rename(Date = V1, Violations = V2, Statistics = V3, Value = V4)
         
+        #sorting via user input
         
+        #beginning with All Violations
         if (input$violation == 'All Violations'){
-            for (i in 1:dim(x())[1]){
-                if (x()[i, 2] == 'Total, all violations [0]'){
-                    dataToPlot = dataToPlot %>% add_row(x()[i,])
-                    plot(x = dataToPlot[,c(1,4)])
+            
+            #total number of incidents
+            if (input$statistic == 'Number of Incidents'){
+                #populating new dataframe and plotting
+                for (i in 1:dim(x())[1]){
+                    if (x()[i, 2] == 'Total, all violations [0]'){
+                        if(x()[i, 3] == 'Actual incidents'){
+                            dataToPlot = dataToPlot %>% add_row(x()[i,])
+                            #finding plot type
+                            if(input$plotType == 'Scatterplot'){
+                                plot(x = dataToPlot[,c(1,4)], xlab = "Year", ylab = "Number of Incidents",
+                                     ylim = c(input$ymin, input$ymax))
+                            }
+                            else if (input$plotType == 'Bar Plot'){
+                                barplot(dataToPlot$Value,
+                                        xlab = 'Number of Incidents', horiz = TRUE, 
+                                        xlim = c(input$xmin, input$xmax), 
+                                        legend.text = dataToPlot$Date)
+                            }
+                        }
+                    }
                 }
             }
-            if (input$statistic == 'Number of Incidents'){
-                
+            
+            #total number of persons cleared
+            else if (input$statistic == 'Persons Cleared'){
+                #populating temp dataframe and plottting
+                for (i in 1:dim(x())[1]){
+                    if (x()[i, 2] == 'Total, all violations [0]'){
+                        if(x()[i, 3] == 'Total cleared'){
+                            dataToPlot = dataToPlot %>% add_row(x()[i,])
+                            plot(x = dataToPlot[,c(1,4)], xlab = "Year", ylab = "Number of Persons Cleared")
+                        }
+                    }
+                }
             }
+            
+            #total adults charged
+            else if (input$statistic == 'Adults (18+ yrs) Charged'){
+                #populating temp dataframe and plottting
+                for (i in 1:dim(x())[1]){
+                    if (x()[i, 2] == 'Total, all violations [0]'){
+                        if(x()[i, 3] == 'Total, adult charged'){
+                            dataToPlot = dataToPlot %>% add_row(x()[i,])
+                            plot(x = dataToPlot[,c(1,4)], xlab = "Year", ylab = "Number of Adults (18+ yrs old) Charged")
+                        }
+                    }
+                }
+            }
+           
+            
         }
         
     })

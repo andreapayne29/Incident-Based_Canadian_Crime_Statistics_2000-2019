@@ -18,7 +18,8 @@ shinyUI(fluidPage(
     #adding radio buttons for decade choice
     radioButtons("dataSource", "Data",
                  c("2000-2009" = "DataFile2000",
-                   "2010-2019" = "DataFile2010")),
+                   "2010-2019" = "DataFile2010",
+                   "All Years (2000-2019)" = "DataFileTotal")),
     
     # Sidebar allowing for user input for what data and what plot
     sidebarLayout(
@@ -34,18 +35,14 @@ shinyUI(fluidPage(
             #conditional analyses for plot type
             conditionalPanel(
                 condition = "input.plotType == 'Scatterplot'",   
-                numericInput("xmin", "x-axis minimum:", 0),
-                numericInput("xmax", "x-axis maximum value:", 1000000),
+                numericInput("ymin", "y-axis minimum:", 2000000),
+                numericInput("ymax", "y-axis maximum value:", 2800000),
                 checkboxInput("scatplotType", "Linear Regression", FALSE)
             ),
             conditionalPanel(
                 condition = "input.plotType == 'Bar Plot'",   
-                checkboxInput("barPlotType", "Density", FALSE),
-                sliderInput("bins",
-                            "Number of bins:",
-                            min = 1,
-                            max = 50,
-                            value = 30)
+                numericInput("xmin", "x-axis minimum:", 2000000),
+                numericInput("xmax", "x-axis maximum value:", 2800000)
             ),
         
             
